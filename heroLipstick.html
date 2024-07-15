@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Virtual Lipstick Try-On</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  #video {
+    width: 100%;
+    max-width: 600px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  #canvas-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+</style>
+</head>
+<body>
+<video id="video" autoplay></video>
+<canvas id="canvas-overlay"></canvas>
+
+<script>
+  const video = document.getElementById('video');
+  const canvas = document.getElementById('canvas-overlay');
+  const ctx = canvas.getContext('2d');
+
+  // Access the camera
+  navigator.mediaDevices.getUserMedia({ video: true })
+    .then(function(stream) {
+      video.srcObject = stream;
+      video.onloadedmetadata = function(e) {
+        video.play();
+      };
+    })
+    .catch(function(err) {
+      console.log("Error: " + err);
+    });
+
+  // Draw lipstick on canvas where the cursor moves
+  canvas.addEventListener('mousemove', function(event) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = 'red'; // Example: Red color for lipstick
+    ctx.beginPath();
+    ctx.arc(event.clientX, event.clientY, 10, 0, 2 * Math.PI);
+    ctx.fill();
+  });
+</script>
+
+</body>
+</html>

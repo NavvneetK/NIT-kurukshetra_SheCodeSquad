@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AR Clothing Try-On</title>
+  <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+  <!-- <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script> -->
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+    .controls {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 1000;
+      background: rgba(255, 255, 255, 0.8);
+      padding: 10px;
+      border-radius: 5px;
+    }
+    .controls select, .controls button {
+      display: block;
+      margin: 5px 0;
+      padding: 10px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="controls">
+    <select id="clothingSelect">
+      <option value="#tshirtModel">T-Shirt</option>
+      <option value="#dressModel">Dress</option>
+      <!-- Add more clothing options here -->
+    </select>
+    <button id="tryOnButton">Try On</button>
+  </div>
+
+  <a-scene embedded arjs>
+    <a-assets>
+      <!-- <a-asset-item id="tshirtModel" src="tshirt.glb"></a-asset-item> -->
+      <a-asset-item id="dressModel" src="http://localhost:3000/fetch-gltf"></a-asset-item>
+      <!-- <a-asset-item id="dressModel" src="dress.glb"></a-asset-item> -->
+      <!-- Add more models as needed -->
+    </a-assets>
+
+    <!-- AR image tracking setup -->
+    <a-nft
+      type="nft"
+      url="https://arjs-cors-proxy.herokuapp.com/https://raw.githack.com/AR-js-org/AR.js/master/aframe/examples/image-tracking/nft/trex/trex-image/trex"
+      smooth="true"
+      smoothCount="10"
+      smoothTolerance=".01"
+      smoothThreshold="5"
+    >
+      <a-entity
+        gltf-model="https://arjs-cors-proxy.herokuapp.com/https://raw.githack.com/AR-js-org/AR.js/master/aframe/examples/image-tracking/nft/trex/scene.gltf"
+        scale="5 5 5"
+        position="50 150 0"
+      >
+      </a-entity>
+    </a-nft>
+    
+    <a-entity camera></a-entity>
+  </a-scene>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const clothingSelect = document.getElementById('clothingSelect');
+      const tryOnButton = document.getElementById('tryOnButton');
+      const modelEntity = document.querySelector('a-nft a-entity'); // Update selector to match your AR model entity
+
+      tryOnButton.addEventListener('click', () => {
+        const selectedClothing = clothingSelect.value;
+        
+        console.log(`Selected Clothing: ${selectedClothing}`);
+        
+        // Change the AR model
+        modelEntity.setAttribute('gltf-model', selectedClothing);
+        
+        // Log the change
+        console.log(`Model changed to: ${selectedClothing}`);
+      });
+      
+      // Log initial setup
+      console.log('AR try-on feature initialized.');
+    });
+  </script>
+</body>
+</html>

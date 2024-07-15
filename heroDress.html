@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Virtual Try-On</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f0f0;
+  }
+  .container {
+    position: relative;
+    width: 80%;
+    max-width: 800px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  #video {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  #overlay {
+    position: absolute;
+    top: 50px; /* Adjust positioning as needed */
+    left: 50px;
+    width: 200px; /* Set initial width */
+    pointer-events: none; /* Ensure overlay doesn't interfere with camera interaction */
+    transition: transform 0.2s ease-in-out; /* Smooth zoom transitions */
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <video id="video" autoplay></video>
+  <img id="overlay" src="dress.png" alt="Tshirt">
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Access the camera
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(function(stream) {
+        var video = document.querySelector('video');
+        video.srcObject = stream;
+        video.onloadedmetadata = function(e) {
+          video.play();
+        };
+      })
+      .catch(function(err) {
+        console.log("Error: " + err);
+      });
+
+    var overlay = document.getElementById('overlay');
+    var container = document.querySelector('.container');
+    var currentScale = 1; // Initial scale factor
+    var minScale = 20 / overlay.clientWidth; // Minimum scale based on initial size
+
+    function zoom(scale) {
+      currentScale *= scale;
+      
+      // Apply minimum scale limit
+      if (currentScale < minScale) {
+        currentScale = minScale;
+      }
+      
+      overlay.style.transform = `scale(${currentScale})`;
+    }
+
+    container.addEventListener('mousemove', function(event) {
+      var rect = container.getBoundingClientRect();
+      var x = event.clientX - rect.left - (overlay.clientWidth / 2);
+      var y = event.clientY - rect.top - (overlay.clientHeight / 2);
+      
+      // Ensure overlay stays within bounds of the container
+      if (x < 0) x = 0;
+      if (y < 0) y = 0;
+      var maxX = container.clientWidth - overlay.clientWidth;
+      var maxY = container.clientHeight - overlay.clientHeight;
+      if (x > maxX) x = maxX;
+      if (y > maxY) y = maxY;
+      
+      // Update overlay position
+      overlay.style.left = x + 'px';
+      overlay.style.top = y + 'px';
+    });
+
+    container.addEventListener('wheel', function(event) {
+      event.preventDefault();
+      var scaleDelta = event.deltaY > 0 ? 0.9 : 1.1; // Adjust zoom sensitivity
+      zoom(scaleDelta);
+    });
+  });
+</script>
+</body>
+</html>
